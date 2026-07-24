@@ -10,7 +10,9 @@
     body { background-color: var(--bg); color: var(--text); padding-bottom: 30px; }
 
     header { background: var(--primary); color: white; padding: 16px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    .nav-tabs { display: flex; background: white; border-bottom: 1px solid #e2e8f0; overflow-x: auto; white-space: nowrap; }
+    header h1 { font-size: 1.25rem; font-weight: 700; }
+
+    .nav-tabs { display: flex; background: white; border-bottom: 1px solid #e2e8f0; overflow-x: auto; white-space: nowrap; position: sticky; top: 0; z-index: 10; }
     .tab-btn { flex: 1; padding: 12px; text-align: center; font-weight: 600; font-size: 0.9rem; border: none; background: none; color: var(--text-muted); cursor: pointer; border-bottom: 3px solid transparent; }
     .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
 
@@ -171,7 +173,7 @@
     // ==========================================
     // YOUR GOOGLE SCRIPT WEB APP URL:
     // ==========================================
-    const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyAQVXxjDxjYx9hSoVE8oWe160RQktMeDXYjwRz3WBviDXGYJqFdtvwSChfCF7WkGA/exec"; 
+    const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbwlDLukcm8trD_w52rSsrf3gJfwcUUHY3I81cvXOzpC9OfgF4NHmbdprLW_HY0jHnJH/exec"; 
 
     let contacts = JSON.parse(localStorage.getItem('alumni_contacts') || '[]');
     let currentIndex = 0;
@@ -351,37 +353,51 @@
       }
     }
 
-    let saveTimeout;
+    // THE FIX: Instant sync to Google Sheets, no delay timers!
+    function syncToGoogle(contactObj) {
+      if (!GOOGLE_SHEET_URL) return;
+      let payload = { 
+        batch: contactObj.batch || 'Unnamed Batch', 
+        name: contactObj.name, 
+        phone: contactObj.phone, 
+        email: contactObj.email, 
+        status: contactObj.status || 'Pending', 
+        notes: contactObj.notes 
+      };
+      fetch(GOOGLE_SHEET_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: JSON.stringify(payload)
+      }).catch(err => console.log("Sheet sync error", err));
+    }
+
     function saveCurrentField(field, val) {
       if (contacts.length === 0) return;
       contacts[currentIndex][field] = val;
       localStorage.setItem('alumni_contacts', JSON.stringify(contacts));
       if (field === 'name' || field === 'phone') updateLinks();
-      
-      // FIX: Capture exact payload immediately so race conditions don't occur when clicking 'Next'
-      let payload = { 
-        batch: contacts[currentIndex].batch || 'Unnamed Batch', 
-        name: contacts[currentIndex].name, 
-        phone: contacts[currentIndex].phone, 
-        email: contacts[currentIndex].email, 
-        status: contacts[currentIndex].status, 
-        notes: contacts[currentIndex].notes 
-      };
-
-      // Auto-sync to Google Sheets with No-Cors fix
-      clearTimeout(saveTimeout);
-      saveTimeout = setTimeout(() => {
-        if(GOOGLE_SHEET_URL) {
-          fetch(GOOGLE_SHEET_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify(payload)
-          }).catch(err => console.log("Sheet sync error", err));
-        }
-      }, 500);
+      syncToGoogle(contacts[currentIndex]);
     }
 
     function navigate(dir) {
+      if (contacts.length === 0) return;
+
+      // Force save whatever is exactly on the screen right now BEFORE moving
+      let c = contacts[currentIndex];
+      c.name = document.getElementById('curr-name').value;
+      c.phone = document.getElementById('curr-phone').value;
+      c.email = document.getElementById('curr-email').value;
+      
+      let currentStatus = document.getElementById('curr-status').value;
+      c.status = currentStatus ? currentStatus : 'Pending';
+      c.notes = document.getElementById('curr-notes').value;
+
+      localStorage.setItem('alumni_contacts', JSON.stringify(contacts));
+      
+      // Fire it instantly to Google Sheets
+      syncToGoogle(c);
+
+      // Safely load the next person
       if (currentIndex + dir >= 0 && currentIndex + dir < contacts.length) {
         currentIndex += dir;
         renderFocused();
