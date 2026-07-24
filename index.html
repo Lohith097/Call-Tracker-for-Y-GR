@@ -5,23 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Smart Alumni Call Assistant</title>
   <style>
-    :root { 
-      --primary: #2563eb; 
-      --whatsapp: #25D366; 
-      --email: #ea4335; 
-      --sms: #8b5cf6; 
-      --bg: #f8fafc; 
-      --card-bg: #ffffff; 
-      --text: #0f172a; 
-      --text-muted: #64748b; 
-    }
+    :root { --primary: #2563eb; --whatsapp: #25D366; --email: #ea4335; --sms: #8b5cf6; --bg: #f8fafc; --card-bg: #ffffff; --text: #0f172a; --text-muted: #64748b; }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background-color: var(--bg); color: var(--text); padding-bottom: 30px; }
 
     header { background: var(--primary); color: white; padding: 16px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    header h1 { font-size: 1.25rem; font-weight: 700; }
-
-    .nav-tabs { display: flex; background: white; border-bottom: 1px solid #e2e8f0; overflow-x: auto; white-space: nowrap; position: sticky; top: 0; z-index: 10; }
+    .nav-tabs { display: flex; background: white; border-bottom: 1px solid #e2e8f0; overflow-x: auto; white-space: nowrap; }
     .tab-btn { flex: 1; padding: 12px; text-align: center; font-weight: 600; font-size: 0.9rem; border: none; background: none; color: var(--text-muted); cursor: pointer; border-bottom: 3px solid transparent; }
     .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
 
@@ -40,12 +29,12 @@
     .input-row { display: flex; gap: 10px; margin-bottom: 12px; }
     .input-row input { flex: 1; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-weight: 600; }
     
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: 600; font-size: 1rem; cursor: pointer; text-decoration: none; color: white; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px 16px; border: none; border-radius: 8px; font-weight: 600; font-size: 1rem; cursor: pointer; text-decoration: none; color: white; }
     .btn-primary { background: var(--primary); }
-    .btn-call { background: var(--primary); }
-    .btn-wa { background: var(--whatsapp); color: #000; }
-    .btn-email { background: var(--email); }
-    .btn-sms { background: var(--sms); }
+    .btn-call { background: var(--primary); padding: 12px; flex: 1; }
+    .btn-wa { background: var(--whatsapp); padding: 12px; color: #000; flex: 1; }
+    .btn-email { background: var(--email); padding: 12px; flex: 1; }
+    .btn-sms { background: var(--sms); padding: 12px; flex: 1; }
     .btn-secondary { background: #64748b; }
     .btn-success { background: #16a34a; }
 
@@ -64,8 +53,8 @@
     .input-with-icon { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
     .field-input { width: 100%; padding: 8px; border: 1px solid transparent; border-radius: 6px; font-size: 0.95rem; color: var(--text-muted); }
     .field-input:focus { border-color: var(--primary); background: #f8fafc; color: var(--text); }
-
-    .action-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; margin-top: 12px; }
+    
+    .action-group { display: flex; gap: 10px; margin-bottom: 12px; }
     .wa-selector { width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 12px; background: #e2e8f0; font-weight: bold;}
     
     .typable-input, .notes-box, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 1rem; margin-bottom: 10px; }
@@ -82,7 +71,7 @@
 </head>
 <body>
 
-  <header><h1>📞 Smart Alumni Call Assistant</h1></header>
+  <header><h1>📞 Alumni Calling Assistant</h1></header>
 
   <div class="nav-tabs">
     <button class="tab-btn active" onclick="switchTab('import', this)">📥 New Batch</button>
@@ -95,11 +84,11 @@
     <!-- TAB 1: PASTE BATCH -->
     <div id="view-import" class="view active">
       <h3>Load Fresh Calling Data</h3>
-      <div class="input-row" style="margin-top: 10px;">
+      <div class="input-row">
         <input type="text" id="batch-name" placeholder="Batch Name (e.g. Batch 2014)">
       </div>
       <textarea id="paste-input" class="import-box" placeholder="Paste Data (Name, Gender, Phone, Email)..."></textarea>
-      <button class="btn btn-primary" onclick="parseBatch()" style="padding: 12px; width: 100%;">🚀 Start Dialing Batch</button>
+      <button class="btn btn-primary" onclick="parseBatch()">🚀 Start Dialing Batch</button>
       <p style="margin-top: 12px; font-size: 0.8rem; color: var(--text-muted); text-align: center;">Data is saved locally and synced to Google Sheets in the background.</p>
     </div>
 
@@ -121,7 +110,7 @@
           <input type="text" id="curr-name" class="contact-name-input" placeholder="Name" onchange="saveCurrentField('name', this.value)">
           <div id="curr-gender" class="gender-badge gender-hidden"></div>
         </div>
-        
+
         <div class="input-with-icon">
           <span>📱</span>
           <input type="text" id="curr-phone" class="field-input" placeholder="No Phone Number" onchange="saveCurrentField('phone', this.value)">
@@ -132,7 +121,7 @@
           <input type="email" id="curr-email" class="field-input" placeholder="No Email Address" onchange="saveCurrentField('email', this.value)">
         </div>
 
-        <!-- Buttons Grid -->
+        <!-- Call, WA, SMS, Email Buttons -->
         <div class="action-group">
           <a id="btn-call-link" href="#" class="btn btn-call">📞 Call</a>
           <a id="btn-wa-link" href="#" target="_blank" class="btn btn-wa">💬 WA</a>
@@ -154,8 +143,8 @@
         <textarea id="curr-notes" class="notes-box" placeholder="Remarks..." onchange="saveCurrentField('notes', this.value)"></textarea>
 
         <div style="display: flex; gap: 10px; margin-top: 10px;">
-          <button class="btn btn-outline" style="flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; background: transparent; color: var(--text); cursor: pointer;" onclick="navigate(-1)">Prev</button>
-          <button class="btn btn-primary" style="flex: 1; padding: 12px;" onclick="navigate(1)">Next ➡️</button>
+          <button class="btn btn-outline" onclick="navigate(-1)">Prev</button>
+          <button class="btn btn-primary" onclick="navigate(1)">Next ➡️</button>
         </div>
       </div>
     </div>
@@ -163,10 +152,10 @@
     <!-- TAB 3: DATABASE / EXPORT -->
     <div id="view-list" class="view">
       <input type="text" id="db-search" class="search-input" placeholder="🔍 Search Database by Name or Phone..." oninput="renderDB(this.value)">
-      
+
       <div style="display: flex; gap: 10px; margin-bottom: 16px; margin-top: 10px;">
-        <button class="btn btn-success" style="flex: 2; padding: 12px;" onclick="exportCSV()">📥 Export DB to Excel</button>
-        <button class="btn btn-secondary" style="flex: 1; padding: 12px; background: #ef4444;" onclick="clearData()">Clear All</button>
+        <button class="btn btn-success" style="flex: 2;" onclick="exportCSV()">📥 Export DB to Excel</button>
+        <button class="btn btn-outline" style="flex: 1;" onclick="clearData()">Clear All</button>
       </div>
       <div style="overflow-x: auto;">
         <table id="contacts-table">
@@ -183,6 +172,7 @@
     // YOUR GOOGLE SCRIPT WEB APP URL:
     // ==========================================
     const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbyAQVXxjDxjYx9hSoVE8oWe160RQktMeDXYjwRz3WBviDXGYJqFdtvwSChfCF7WkGA/exec"; 
+
     let contacts = JSON.parse(localStorage.getItem('alumni_contacts') || '[]');
     let currentIndex = 0;
 
@@ -368,6 +358,16 @@
       localStorage.setItem('alumni_contacts', JSON.stringify(contacts));
       if (field === 'name' || field === 'phone') updateLinks();
       
+      // FIX: Capture exact payload immediately so race conditions don't occur when clicking 'Next'
+      let payload = { 
+        batch: contacts[currentIndex].batch || 'Unnamed Batch', 
+        name: contacts[currentIndex].name, 
+        phone: contacts[currentIndex].phone, 
+        email: contacts[currentIndex].email, 
+        status: contacts[currentIndex].status, 
+        notes: contacts[currentIndex].notes 
+      };
+
       // Auto-sync to Google Sheets with No-Cors fix
       clearTimeout(saveTimeout);
       saveTimeout = setTimeout(() => {
@@ -375,17 +375,10 @@
           fetch(GOOGLE_SHEET_URL, {
             method: 'POST',
             mode: 'no-cors',
-            body: JSON.stringify({ 
-              batch: contacts[currentIndex].batch || 'Unnamed Batch', 
-              name: contacts[currentIndex].name, 
-              phone: contacts[currentIndex].phone, 
-              email: contacts[currentIndex].email, 
-              status: contacts[currentIndex].status, 
-              notes: contacts[currentIndex].notes 
-            })
+            body: JSON.stringify(payload)
           }).catch(err => console.log("Sheet sync error", err));
         }
-      }, 1000);
+      }, 500);
     }
 
     function navigate(dir) {
